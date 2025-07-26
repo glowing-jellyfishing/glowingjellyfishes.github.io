@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #1c1c1c;
+  color: #f0f0f0;
+}
+
+header {
+  background-color: #202020;
+  padding: 20px;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 10px;
+  color: #00bfff;
+  text-decoration: none;
+}
+
+section#game-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.game-card {
+  background: #2a2a2a;
+  margin: 10px;
+  padding: 10px;
+  width: 200px;
+  border-radius: 8px;
+}
