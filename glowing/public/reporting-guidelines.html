@@ -26,6 +26,11 @@
   </style>
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem('hcaptcha-completed')) {
+      window.location.href = '/glowing/capcha.html';
+    }
+  </script>
   <h1>Reporting Guidelines</h1>
   <p>To help us keep the game safe and fun, please follow these guidelines when submitting reports:</p>
 

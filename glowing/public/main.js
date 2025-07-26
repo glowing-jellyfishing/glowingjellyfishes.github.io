@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Check if hCaptcha is completed
+  if (!localStorage.getItem('hcaptcha-completed')) {
+    window.location.href = '/glowing/capcha.html';
+    return;
+  }
+
   fetch('/api/games')
     .then(res => res.json())
     .then(data => {

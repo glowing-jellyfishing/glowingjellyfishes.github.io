@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captcha Required</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Captcha Required</h1>
+        <p>You must complete the captcha to continue.</p>
+        <form id="captcha-form">
+            <!-- hCaptcha widget will be inserted here -->
+            <div class="h-captcha" data-sitekey="9e42b068-6844-4c94-83b8-cb04889e8128"></div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <script>
+    document.getElementById('captcha-form').onsubmit = function(e) {
+        e.preventDefault();
+        var response = hcaptcha.getResponse();
+        if (response.length === 0) {
+            alert('Please complete the captcha.');
+            return false;
+        }
+        // Mark captcha as completed in localStorage
+        localStorage.setItem('hcaptcha-completed', 'true');
+        // Redirect to home or previous page
+        window.location.href = '/';
+    };
+    </script>
+</body>
+</html>
