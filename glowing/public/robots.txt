@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://glowing-jellyfishing.github.io/sitemap.xml
