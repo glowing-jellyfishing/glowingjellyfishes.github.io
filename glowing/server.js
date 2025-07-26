@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // ✅ Middleware to support clean URLs
 app.use((req, res, next) => {
@@ -15,6 +15,7 @@ app.use((req, res, next) => {
 // ✅ Serve static files from /public
 app.use(express.static('public'));
 
+
 // ✅ Sample API route
 app.get('/api/games', (req, res) => {
   res.json([
@@ -22,6 +23,18 @@ app.get('/api/games', (req, res) => {
     { name: "Tycoon City", description: "Build your business empire!" },
     { name: "Survival Madness", description: "Can you last the night?" }
   ]);
+});
+
+// ✅ VPN Detector API
+const axios = require('axios');
+app.get('/api/vpn-check', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  try {
+    const response = await axios.get(`http://ip-api.com/json/${ip}?fields=proxy,hosting,query`);
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: 'VPN check failed' });
+  }
 });
 
 // ✅ Custom 404 page
