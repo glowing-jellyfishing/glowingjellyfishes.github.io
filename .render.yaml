@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: glowing-app
+    rootDir: glowing
+    buildCommand: npm install
+    startCommand: npm start
+    env: node
