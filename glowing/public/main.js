@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Check if hCaptcha is completed
   if (!localStorage.getItem('hcaptcha-completed')) {
-    window.location.href = '/glowing/capcha.html';
+    window.location.href = '/capcha.html';
     return;
   }
 
