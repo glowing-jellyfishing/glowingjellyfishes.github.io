@@ -2,6 +2,14 @@ const express = require('express');
 const app = express();
 const PORT = 3000;
 
+app.use((req, res, next) => {
+  if (!req.url.includes('.') && req.url !== '/') {
+    req.url += '.html';
+  }
+  next();
+});
+
+
 app.use(express.static('public'));
 
 app.get('/api/games', (req, res) => {
