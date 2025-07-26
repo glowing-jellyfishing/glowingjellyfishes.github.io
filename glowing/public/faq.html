@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ - Glowing Jellyfishing</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .faq-container { max-width: 700px; margin: 40px auto; background: #232323; padding: 30px 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .faq-container h1 { color: #00bfff; text-align: center; }
+    .faq-item { margin-bottom: 25px; }
+    .faq-question { font-weight: bold; color: #00bfff; cursor: pointer; }
+    .faq-answer { display: none; margin-top: 8px; color: #f0f0f0; }
+    .faq-question.open + .faq-answer { display: block; }
+  </style>
+</head>
+<body>
+  <div class="faq-container">
+    <h1>Frequently Asked Questions</h1>
+    <div class="faq-item">
+      <div class="faq-question">What is Glowing Jellyfishing?</div>
+      <div class="faq-answer">Glowing Jellyfishing is a fun and interactive platform for games and community engagement.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">How do I report a bug or issue?</div>
+      <div class="faq-answer">You can report bugs or issues using the reporting guidelines page linked in the navigation menu.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Is my data safe?</div>
+      <div class="faq-answer">We take your privacy seriously and do not share your data with third parties.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">How do I contact support?</div>
+      <div class="faq-answer">You can contact support via the contact form or by emailing us directly (see the About page).</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Why do I see a captcha?</div>
+      <div class="faq-answer">The captcha helps us prevent spam and keep the platform secure for everyone.</div>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', function() {
+        this.classList.toggle('open');
+        const answer = this.nextElementSibling;
+        answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+  </script>
+</body>
+</html>
