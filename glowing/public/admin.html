@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel Login</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .admin-container { max-width: 400px; margin: 60px auto; background: #232323; padding: 30px 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; }
+    .admin-container input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #181818; color: #fff; }
+    .admin-container button { padding: 10px 30px; background: #00bfff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+    .admin-container button:hover { background: #0099cc; }
+    .admin-panel { display: none; margin-top: 20px; }
+    .error { color: #ff4d4d; }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <h1>Admin Panel</h1>
+    <form id="login-form">
+      <input type="password" id="admin-password" placeholder="Enter password" required />
+      <button type="submit">Login</button>
+      <div class="error" id="error-msg"></div>
+    </form>
+    <div class="admin-panel" id="admin-panel">
+      <h2>Welcome, Admin!</h2>
+      <p>This is your admin panel. Add your admin features here.</p>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <script>
+    const PASSWORD = 'I@m1hacker';
+    const loginForm = document.getElementById('login-form');
+    const adminPanel = document.getElementById('admin-panel');
+    const errorMsg = document.getElementById('error-msg');
+
+    if (localStorage.getItem('admin-logged-in') === 'true') {
+      loginForm.style.display = 'none';
+      adminPanel.style.display = 'block';
+    }
+
+    loginForm.onsubmit = function(e) {
+      e.preventDefault();
+      const input = document.getElementById('admin-password').value;
+      if (input === PASSWORD) {
+        localStorage.setItem('admin-logged-in', 'true');
+        loginForm.style.display = 'none';
+        adminPanel.style.display = 'block';
+        errorMsg.textContent = '';
+      } else {
+        errorMsg.textContent = 'Incorrect password.';
+      }
+    };
+
+    function logout() {
+      localStorage.removeItem('admin-logged-in');
+      loginForm.style.display = 'block';
+      adminPanel.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
