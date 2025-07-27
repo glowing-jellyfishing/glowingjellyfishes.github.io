@@ -17,10 +17,31 @@
   </header>
 
   <main>
-    <section id="game-list">
+    <section id="game-menu" style="margin-bottom: 40px;">
+      <h2 style="text-align:center;color:#00bfff;">Game Menu</h2>
+      <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">
+        <div class="game-menu-card">
+          <div class="game-menu-icon">🎲</div>
+          <div class="game-menu-title">Random Game</div>
+        </div>
+        <div class="game-menu-card">
+          <div class="game-menu-icon">🧩</div>
+          <div class="game-menu-title">Puzzle</div>
+        </div>
+        <div class="game-menu-card">
+          <div class="game-menu-icon">⚔️</div>
+          <div class="game-menu-title">Adventure</div>
+        </div>
+        <div class="game-menu-card">
+          <div class="game-menu-icon">🏆</div>
+          <div class="game-menu-title">Challenge</div>
+        </div>
+      </div>
+    </section>
       <div class="game-card">
-        <h3>Obby Rush</h3>
-        <p>Dodge obstacles and race your friends!</p>
+        <h3>Tic Tac Toe Multiplayer</h3>
+        <p>Challenge your friends in a classic game of Tic Tac Toe!</p>
+        <a href="tic-tac-toe.html" class="play-btn">Play</a>
       </div>
       <div class="game-card">
         <h3>Tycoon City</h3>
@@ -36,6 +57,52 @@
   <footer>
     <p>&copy; 2025 Glowing Jellyfishing</p>
   </footer>
+  <style>
+    .game-menu-card {
+      background: #232323;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      width: 140px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+    .game-menu-card:hover {
+      transform: translateY(-6px) scale(1.04);
+      box-shadow: 0 6px 18px rgba(0,191,255,0.15);
+    }
+    .game-menu-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    .game-menu-title {
+      color: #00bfff;
+      font-weight: bold;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+  </style>
+  <style>
+    .play-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 24px;
+      background: #00bfff;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .play-btn:hover {
+      background: #0099cc;
+    }
+  </style>
   <script src="main.js"></script>
 </body>
 </html>

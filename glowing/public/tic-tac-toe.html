@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe | Glowing Jellyfishing</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .ttt-board {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-template-rows: repeat(3, 80px);
+      gap: 8px;
+      justify-content: center;
+      margin: 40px auto 20px auto;
+    }
+    .ttt-cell {
+      width: 80px;
+      height: 80px;
+      background: #232323;
+      color: #00bfff;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .ttt-cell:hover {
+      background: #2a2a2a;
+    }
+    .ttt-status {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: #00bfff;
+    }
+    .ttt-reset {
+      display: block;
+      margin: 0 auto 20px auto;
+      padding: 10px 30px;
+      background: #00bfff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .ttt-reset:hover {
+      background: #0099cc;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tic-Tac-Toe</h1>
+    <nav>
+      <a href="index.html">Home</a>
+    </nav>
+  </header>
+  <main>
+    <div class="ttt-status" id="ttt-status">Player X's turn</div>
+    <div class="ttt-board" id="ttt-board"></div>
+    <button class="ttt-reset" id="ttt-reset">Restart Game</button>
+  </main>
+  <footer>
+    <p>&copy; 2025 Glowing Jellyfishing</p>
+  </footer>
+  <script>
+    const board = document.getElementById('ttt-board');
+    const statusDiv = document.getElementById('ttt-status');
+    const resetBtn = document.getElementById('ttt-reset');
+    let cells, currentPlayer, gameActive;
+
+    function initGame() {
+      board.innerHTML = '';
+      cells = Array(9).fill('');
+      currentPlayer = 'X';
+      gameActive = true;
+      statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'ttt-cell';
+        cell.dataset.index = i;
+        cell.addEventListener('click', handleCellClick);
+        board.appendChild(cell);
+      }
+    }
+
+    function handleCellClick(e) {
+      const idx = e.target.dataset.index;
+      if (!gameActive || cells[idx]) return;
+      cells[idx] = currentPlayer;
+      e.target.textContent = currentPlayer;
+      if (checkWin()) {
+        statusDiv.textContent = `Player ${currentPlayer} wins!`;
+        gameActive = false;
+      } else if (cells.every(cell => cell)) {
+        statusDiv.textContent = "It's a draw!";
+        gameActive = false;
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusDiv.textContent = `Player ${currentPlayer}'s turn`;
+      }
+    }
+
+    function checkWin() {
+      const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8], // rows
+        [0,3,6],[1,4,7],[2,5,8], // cols
+        [0,4,8],[2,4,6]          // diags
+      ];
+      return winPatterns.some(pattern =>
+        pattern.every(idx => cells[idx] === currentPlayer)
+      );
+    }
+
+    resetBtn.onclick = initGame;
+    initGame();
+  </script>
+</body>
+</html>
