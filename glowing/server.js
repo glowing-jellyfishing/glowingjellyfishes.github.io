@@ -4,7 +4,7 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 
 const validator = require('validator');
-
+const requestIp = require('request-ip');
 
 const app = express();
 const PORT = 3000;
@@ -25,7 +25,7 @@ app.use(express.static('public'));
 // ✅ VPN Detector API
 const axios = require('axios');
 app.get('/api/vpn-check', async (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const ip = requestIp.getClientIp(req);
   if (!validator.isIP(ip)) {
     return res.status(400).json({ error: 'Invalid IP address' });
   }
