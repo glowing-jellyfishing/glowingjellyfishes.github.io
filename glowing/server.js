@@ -16,14 +16,6 @@ app.use((req, res, next) => {
 app.use(express.static('public'));
 
 
-// ✅ Sample API route
-app.get('/api/games', (req, res) => {
-  res.json([
-    { name: "Obby Rush", description: "Dodge obstacles and race your friends!" },
-    { name: "Tycoon City", description: "Build your business empire!" },
-    { name: "Survival Madness", description: "Can you last the night?" }
-  ]);
-});
 
 // ✅ VPN Detector API
 const axios = require('axios');
