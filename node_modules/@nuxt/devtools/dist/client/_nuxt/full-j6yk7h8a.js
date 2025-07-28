@@ -1,1 +1,0 @@
-import{b as t}from"./czf9xkmw.js";import{J as e,a3 as r,W as s}from"./vendor/json-editor-vue-m9gzt21j.js";import"./vendor/unocss-oyl7opas.js";import"./vendor/shiki-imfwxqoq.js";const a={},c={"h-full":"","of-auto":""};function n(o,f){return r(),e("div",c,[s(o.$slots,"default")])}const d=t(a,[["render",n]]);export{d as default};
