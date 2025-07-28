@@ -260,7 +260,12 @@ app.post('/api/follow', (req, res) => {
 });
 
 // Redeem endpoint
-app.post('/api/redeem', (req, res) => {
+const redeemLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 redeem requests per windowMs
+  message: { error: 'Too many redeem attempts, please try again later.' }
+});
+app.post('/api/redeem', redeemLimiter, (req, res) => {
   const session = getSession(req);
   if (!session) return res.json({ error: 'Not logged in.' });
   let users = loadUsers();
