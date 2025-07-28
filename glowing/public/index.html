@@ -13,6 +13,7 @@
       <a href="#">Home</a>
       <a href="download">Play</a>
       <a href="https://glowing-jellyfishing.betteruptime.com/">Status</a>
+      <span id="profileNavBtn"></span>
     </nav>
   </header>
 
@@ -104,5 +105,19 @@
     }
   </style>
   <script src="main.js"></script>
+</body>
+<script>
+// Dynamically show profile or signin/signup button
+fetch('/api/session', { credentials: 'include' })
+  .then(r => r.json())
+  .then(data => {
+    const btn = document.getElementById('profileNavBtn');
+    if (data.loggedIn) {
+      btn.innerHTML = '<a href="profile.html">Profile</a>';
+    } else {
+      btn.innerHTML = '<a href="login.html">Sign In</a> / <a href="signup.html">Sign Up</a>';
+    }
+  });
+</script>
 </body>
 </html>
