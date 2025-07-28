@@ -33,6 +33,7 @@
     "pm2": "^6.0.8",
     "prettier": "^3.6.2",
     "request-ip": "^3.3.0",
+    "rimraf": "^6.0.1",
     "socket.io": "^4.8.1",
     "validator": "^13.15.15",
     "webpack": "^5.100.2"
