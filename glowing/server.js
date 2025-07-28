@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
@@ -11,6 +12,8 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
 
+const app = express();
+const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
