@@ -272,13 +272,6 @@ app.post('/api/redeem', (req, res) => {
   log('User', user.username, 'redeemed code', code, 'for', value, 'glows');
   res.json({ success: true, message: `Redeemed for ${value} glows!` });
 });
-const express = require('express');
-const path = require('path');
-
-const rateLimit = require('express-rate-limit');
-
-const validator = require('validator');
-const requestIp = require('request-ip');
 
 
 // ✅ Middleware to support clean URLs
@@ -295,7 +288,6 @@ app.use(express.static('public'));
 
 
 // ✅ VPN Detector API
-const axios = require('axios');
 app.get('/api/vpn-check', async (req, res) => {
   const ip = requestIp.getClientIp(req);
   if (!validator.isIP(ip)) {
