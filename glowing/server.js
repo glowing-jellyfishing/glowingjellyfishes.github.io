@@ -1,3 +1,26 @@
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+const dayjs = require('dayjs');
+const crypto = require('crypto');
+const express = require('express');
+const path = require('path');
+const rateLimit = require('express-rate-limit');
+const validator = require('validator');
+const requestIp = require('request-ip');
+
+
+app.use(express.json());
+app.use(cookieParser());
+
+const USERS_FILE = path.join(__dirname, 'users.json');
+const AVATAR_DIR = path.join(__dirname, 'public', 'avatars');
+if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR);
+
+// Logging
+const log = (...args) => {
 // Admin endpoints (simple password, for demo)
 const ADMIN_PASSWORD = 'I@m1hacker';
 function isAdmin(req) {
@@ -61,23 +84,6 @@ app.post('/api/admin/regen-codes', (req, res) => {
   generateRedeemCodes();
   res.json({ success: true });
 });
-const fs = require('fs');
-const bcrypt = require('bcrypt');
-const cookieParser = require('cookie-parser');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
-const dayjs = require('dayjs');
-const crypto = require('crypto');
-
-app.use(express.json());
-app.use(cookieParser());
-
-const USERS_FILE = path.join(__dirname, 'users.json');
-const AVATAR_DIR = path.join(__dirname, 'public', 'avatars');
-if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR);
-
-// Logging
-const log = (...args) => {
   const msg = `[${new Date().toISOString()}] ` + args.join(' ');
   fs.appendFileSync('server.log', msg + '\n');
   console.log(msg);
@@ -274,8 +280,6 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
 
-const app = express();
-const PORT = 3000;
 
 // ✅ Middleware to support clean URLs
 app.use((req, res, next) => {
