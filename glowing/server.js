@@ -162,7 +162,10 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
   let avatar = '';
   if (req.file) {
     const ext = path.extname(req.file.originalname);
-    const newPath = path.join(AVATAR_DIR, req.file.filename + ext);
+    const newPath = path.resolve(AVATAR_DIR, req.file.filename + ext);
+    if (!newPath.startsWith(path.resolve(AVATAR_DIR))) {
+      return res.status(400).json({ error: 'Invalid file path.' });
+    }
     fs.renameSync(req.file.path, newPath);
     avatar = 'avatars/' + path.basename(newPath);
   }
