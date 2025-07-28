@@ -25,8 +25,21 @@
     </form>
     <div class="admin-panel" id="admin-panel">
       <h2>Welcome, Admin!</h2>
-      <p>This is your admin panel. Add your admin features here.</p>
+      <div>
+        <h3>User Management</h3>
+        <div id="userList"></div>
+      </div>
+      <div>
+        <h3>Redeem Codes</h3>
+        <div id="codeList"></div>
+        <button id="regenCodesBtn">Regenerate Codes</button>
+      </div>
+      <div>
+        <h3>Server Logs</h3>
+        <pre id="serverLogs" style="max-height:200px;overflow:auto;background:#181818;color:#0f0;font-size:0.9em;"></pre>
+      </div>
       <button onclick="logout()">Logout</button>
+  <script src="admin.js"></script>
     </div>
   </div>
   <script>
