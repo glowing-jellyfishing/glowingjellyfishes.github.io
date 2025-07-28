@@ -12,7 +12,9 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
 
+
 const app = express();
+app.set('trust proxy', 1);
 const PORT = 3000;
 
 app.use(express.json());
