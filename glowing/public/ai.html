@@ -25,6 +25,18 @@
     const chatDiv = document.getElementById('ai-chat');
     const input = document.getElementById('ai-input');
     const sendBtn = document.getElementById('ai-send');
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        switch (m) {
+          case '&': return '&amp;';
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '"': return '&quot;';
+          case "'": return '&#39;';
+          default: return m;
+        }
+      });
+    }
     function simpleAIResponse(msg) {
       msg = msg.toLowerCase();
       if(msg.includes('hello') || msg.includes('hi')) return "Hi there! How can I help you today?";
@@ -37,7 +49,7 @@
     sendBtn.onclick = () => {
       const userMsg = input.value.trim();
       if(!userMsg) return;
-      chatDiv.innerHTML += `<br><b>You:</b> ${userMsg}`;
+      chatDiv.innerHTML += `<br><b>You:</b> ${escapeHTML(userMsg)}`;
       setTimeout(() => {
         const aiMsg = simpleAIResponse(userMsg);
         chatDiv.innerHTML += `<br><b>AI:</b> ${aiMsg}`;
