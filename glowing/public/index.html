@@ -8,6 +8,13 @@
 </head>
 <body>
   <header>
+    <select id="langSelect" style="position:absolute;top:20px;left:20px;">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+    </select>
+    <button id="themeToggleBtn" style="position:absolute;top:20px;right:20px;">🌙/☀️</button>
     <h1>Welcome to Glowing Jellyfishing</h1>
     <nav>
       <a href="#">Home</a>
@@ -105,6 +112,29 @@
     }
   </style>
   <script src="main.js"></script>
+<script>
+document.getElementById('langSelect').onchange = function() {
+  localStorage.setItem('lang', this.value);
+  window.location.reload();
+};
+if (localStorage.getItem('lang')) {
+  document.getElementById('langSelect').value = localStorage.getItem('lang');
+}
+</script>
+<script>
+document.getElementById('themeToggleBtn').onclick = function() {
+  if (document.documentElement.getAttribute('data-theme') === 'light') {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  }
+};
+if (localStorage.getItem('theme') === 'light') {
+  document.documentElement.setAttribute('data-theme', 'light');
+}
+</script>
 </body>
 <script>
 // Dynamically show profile or signin/signup button

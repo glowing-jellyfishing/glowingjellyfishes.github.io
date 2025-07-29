@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(users => {
         const list = document.getElementById('userList');
         list.innerHTML = '';
+        const bioMod = document.getElementById('bioModeration');
+        bioMod.innerHTML = '';
         users.forEach(u => {
           const div = document.createElement('div');
           div.innerHTML = `
@@ -30,6 +32,20 @@ document.addEventListener('DOMContentLoaded', function() {
               fetch('/api/admin/ban', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ id: u.id, reason, duration }) })
                 .then(() => loadUsers());
             }
+          };
+
+          // Bio moderation
+          const bioDiv = document.createElement('div');
+          bioDiv.innerHTML = `<b>${u.username}</b> (ID: ${u.id})<br>Bio: <input type="text" value="${u.bio || ''}" style="width:200px;"> <button class="saveBioBtn">Save</button> <button class="deleteBioBtn">Delete</button><hr>`;
+          bioMod.appendChild(bioDiv);
+          bioDiv.querySelector('.saveBioBtn').onclick = function() {
+            const newBio = bioDiv.querySelector('input').value;
+            fetch('/api/admin/set-bio', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ id: u.id, bio: newBio }) })
+              .then(() => loadUsers());
+          };
+          bioDiv.querySelector('.deleteBioBtn').onclick = function() {
+            fetch('/api/admin/set-bio', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ id: u.id, bio: '' }) })
+              .then(() => loadUsers());
           };
         });
       });

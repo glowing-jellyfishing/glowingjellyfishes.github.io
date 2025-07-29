@@ -3,6 +3,12 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const res = await fetch('/api/admin/analytics', { credentials: 'include' });
     const data = await res.json();
+    // Load audit logs
+    fetch('/api/admin/logs', { credentials: 'include' })
+      .then(r => r.text())
+      .then(logs => {
+        document.getElementById('auditLogs').textContent = logs;
+      });
     // Logins chart
     new Chart(document.getElementById('loginsChart').getContext('2d'), {
         type: 'line',

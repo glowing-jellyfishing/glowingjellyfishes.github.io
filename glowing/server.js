@@ -1,3 +1,14 @@
+// Set bio (admin moderation)
+app.post('/api/admin/set-bio', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  let users = loadUsers();
+  const { id, bio } = req.body;
+  const user = users.find(u => u.id === id);
+  if (!user) return res.json({ error: 'User not found.' });
+  user.bio = bio;
+  saveUsers(users);
+  res.json({ success: true });
+});
 // Simple analytics tracking
 const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
 function loadAnalytics() {
@@ -188,7 +199,7 @@ else redeemCodes = JSON.parse(fs.readFileSync('redeem-codes.json'));
 
 // Signup endpoint
 app.post('/api/signup', upload.single('avatar'), async (req, res) => {
-  let { username, password, birthday, gender } = req.body;
+  let { username, password, birthday, gender, invite } = req.body;
   if (!username || !password || !birthday || !gender) return res.json({ error: 'All fields required.' });
   let users = loadUsers();
   if (users.find(u => u.username === username)) return res.json({ error: 'Username already taken.' });
@@ -210,6 +221,16 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
     avatar = 'avatars/' + path.basename(newPath);
   }
   const id = genUserId();
+  const inviteCode = crypto.randomBytes(6).toString('hex');
+  let referrals = 0;
+  if (invite) {
+    const inviter = users.find(u => u.inviteCode === invite);
+    if (inviter) {
+      inviter.referrals = (inviter.referrals || 0) + 1;
+      referrals = inviter.referrals;
+      saveUsers(users);
+    }
+  }
   const user = {
     id,
     username,
@@ -218,10 +239,13 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
     gender,
     avatar,
     glows: 0,
+    stars: 0,
     followers: [],
     bio: '',
     createdAt: Date.now(),
-    banned: false
+    banned: false,
+    inviteCode,
+    referrals
   };
   users.push(user);
   saveUsers(users);
@@ -279,11 +303,25 @@ app.get('/api/profile', (req, res) => {
     username: user.username,
     bio: user.bio,
     glows: user.glows,
+    stars: user.stars || 0,
     followers: user.followers.length,
     avatar: user.avatar,
     createdAt: user.createdAt,
+    inviteCode: user.inviteCode,
+    referrals: user.referrals || 0,
     isOwner: true
   });
+// Buy stars (premium currency, demo)
+app.post('/api/buy-stars', (req, res) => {
+  const session = getSession(req);
+  if (!session) return res.json({ error: 'Not logged in.' });
+  let users = loadUsers();
+  const user = users.find(u => u.id === session.userId);
+  if (!user) return res.json({ error: 'Not found.' });
+  user.stars = (user.stars || 0) + 10;
+  saveUsers(users);
+  res.json({ success: true, stars: user.stars, message: 'Purchased 10 stars (demo)!' });
+});
 });
 
 // Update bio

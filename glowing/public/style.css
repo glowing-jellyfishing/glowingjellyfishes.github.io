@@ -1,3 +1,46 @@
+@media (max-width: 600px) {
+  .form-container, .profile-container, .dashboard-container, .leaderboard-container {
+    max-width: 98vw;
+    padding: 10px;
+    font-size: 1rem;
+  }
+  table {
+    font-size: 0.9rem;
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+  }
+  th, td {
+    padding: 6px;
+  }
+  #themeToggleBtn {
+    top: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+  }
+}
+:root {
+  --bg-color: #1c1c1c;
+  --text-color: #f0f0f0;
+  --primary-color: #00bfff;
+  --card-bg: #232323;
+}
+[data-theme="light"] {
+  --bg-color: #f0f0f0;
+  --text-color: #1c1c1c;
+  --primary-color: #0077ff;
+  --card-bg: #fff;
+}
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+.form-container, .profile-container, .dashboard-container, .leaderboard-container {
+  background: var(--card-bg);
+}
+.profile-avatar {
+  border: 3px solid var(--primary-color);
+}
 /* Form Styles */
 .form-container {
   max-width: 400px;
