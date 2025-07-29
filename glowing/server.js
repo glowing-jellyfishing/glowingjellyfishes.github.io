@@ -1,3 +1,13 @@
+// Leaderboard endpoint
+app.get('/api/leaderboard', (req, res) => {
+  let users = loadUsers();
+  // Ensure achievements field exists
+  users.forEach(u => { if (!u.achievements) u.achievements = []; });
+  // Sort by glows descending
+  users.sort((a, b) => b.glows - a.glows);
+  // Return top 20
+  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] })));
+});
 
 
 const fs = require('fs');
@@ -215,6 +225,11 @@ app.post('/api/login', async (req, res) => {
   if (!match) return res.json({ error: 'Invalid credentials.' });
   const token = createSession(user.id);
   res.cookie('session', token, { httpOnly: true });
+  if (!user.achievements) user.achievements = [];
+  if (!user.achievements.includes('First Login')) {
+    user.achievements.push('First Login');
+    saveUsers(users);
+  }
   log('User logged in:', username);
   res.json({ success: true, message: 'Login successful!' });
 });
@@ -294,6 +309,10 @@ app.post('/api/redeem', redeemLimiter, (req, res) => {
   if (idx === -1) return res.json({ error: 'Invalid code.' });
   const value = redeemCodes[idx].value;
   user.glows += value;
+  if (!user.achievements) user.achievements = [];
+  if (!user.achievements.includes('First Redeem')) {
+    user.achievements.push('First Redeem');
+  }
   redeemCodes.splice(idx, 1);
   fs.writeFileSync('redeem-codes.json', JSON.stringify(redeemCodes, null, 2));
   saveUsers(users);
