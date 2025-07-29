@@ -166,7 +166,13 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
     if (!newPath.startsWith(path.resolve(AVATAR_DIR))) {
       return res.status(400).json({ error: 'Invalid file path.' });
     }
-    fs.renameSync(req.file.path, newPath);
+    // Ensure the uploaded file path is within the expected upload directory
+    const uploadDir = path.resolve('uploads'); // Change 'uploads' if your multer dest is different
+    const filePathResolved = path.resolve(req.file.path);
+    if (!filePathResolved.startsWith(uploadDir)) {
+      return res.status(400).json({ error: 'Invalid upload file path.' });
+    }
+    fs.renameSync(filePathResolved, newPath);
     avatar = 'avatars/' + path.basename(newPath);
   }
   const id = genUserId();
