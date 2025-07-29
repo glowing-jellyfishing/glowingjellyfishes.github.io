@@ -2,8 +2,8 @@
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
+const csrf = require('lusca').csrf;
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
 const dayjs = require('dayjs');
 const crypto = require('crypto');
 const express = require('express');
@@ -19,6 +19,7 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(csrf());
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const AVATAR_DIR = path.join(__dirname, 'public', 'avatars');
