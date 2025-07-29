@@ -1,3 +1,18 @@
+// Simple analytics tracking
+const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
+function loadAnalytics() {
+  try { return JSON.parse(fs.readFileSync(ANALYTICS_FILE)); } catch { return {}; }
+}
+function saveAnalytics(data) {
+  fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2));
+}
+function trackEvent(type) {
+  const today = dayjs().format('YYYY-MM-DD');
+  let analytics = loadAnalytics();
+  if (!analytics[today]) analytics[today] = { logins: 0, signups: 0, redeems: 0 };
+  analytics[today][type] = (analytics[today][type] || 0) + 1;
+  saveAnalytics(analytics);
+}
 // Leaderboard endpoint
 app.get('/api/leaderboard', (req, res) => {
   let users = loadUsers();
@@ -216,6 +231,8 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
+  trackEvent('logins');
+  trackEvent('signups');
   const { username, password } = req.body;
   let users = loadUsers();
   const user = users.find(u => u.username === username);
@@ -299,6 +316,19 @@ const redeemLimiter = rateLimit({
   message: { error: 'Too many redeem attempts, please try again later.' }
 });
 app.post('/api/redeem', redeemLimiter, (req, res) => {
+  trackEvent('redeems');
+// Admin analytics endpoint
+app.get('/api/admin/analytics', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  let analytics = loadAnalytics();
+  const dates = Object.keys(analytics).sort();
+  res.json({
+    dates,
+    logins: dates.map(d => analytics[d].logins),
+    signups: dates.map(d => analytics[d].signups),
+    redeems: dates.map(d => analytics[d].redeems)
+  });
+});
   const session = getSession(req);
   if (!session) return res.json({ error: 'Not logged in.' });
   let users = loadUsers();
