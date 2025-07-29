@@ -1,7 +1,9 @@
 
+
 const fs = require('fs');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const csrf = require('lusca').csrf;
 const multer = require('multer');
 const dayjs = require('dayjs');
@@ -19,6 +21,12 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
 app.use(csrf());
 
 const USERS_FILE = path.join(__dirname, 'users.json');
