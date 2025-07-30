@@ -1,3 +1,39 @@
+// Set bio (admin moderation)
+app.post('/api/admin/set-bio', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  let users = loadUsers();
+  const { id, bio } = req.body;
+  const user = users.find(u => u.id === id);
+  if (!user) return res.json({ error: 'User not found.' });
+  user.bio = bio;
+  saveUsers(users);
+  res.json({ success: true });
+});
+// Simple analytics tracking
+const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
+function loadAnalytics() {
+  try { return JSON.parse(fs.readFileSync(ANALYTICS_FILE)); } catch { return {}; }
+}
+function saveAnalytics(data) {
+  fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2));
+}
+function trackEvent(type) {
+  const today = dayjs().format('YYYY-MM-DD');
+  let analytics = loadAnalytics();
+  if (!analytics[today]) analytics[today] = { logins: 0, signups: 0, redeems: 0 };
+  analytics[today][type] = (analytics[today][type] || 0) + 1;
+  saveAnalytics(analytics);
+}
+// Leaderboard endpoint
+app.get('/api/leaderboard', (req, res) => {
+  let users = loadUsers();
+  // Ensure achievements field exists
+  users.forEach(u => { if (!u.achievements) u.achievements = []; });
+  // Sort by glows descending
+  users.sort((a, b) => b.glows - a.glows);
+  // Return top 20
+  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] })));
+});
 
 
 const fs = require('fs');
@@ -163,7 +199,7 @@ else redeemCodes = JSON.parse(fs.readFileSync('redeem-codes.json'));
 
 // Signup endpoint
 app.post('/api/signup', upload.single('avatar'), async (req, res) => {
-  let { username, password, birthday, gender } = req.body;
+  let { username, password, birthday, gender, invite } = req.body;
   if (!username || !password || !birthday || !gender) return res.json({ error: 'All fields required.' });
   let users = loadUsers();
   if (users.find(u => u.username === username)) return res.json({ error: 'Username already taken.' });
@@ -185,6 +221,16 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
     avatar = 'avatars/' + path.basename(newPath);
   }
   const id = genUserId();
+  const inviteCode = crypto.randomBytes(6).toString('hex');
+  let referrals = 0;
+  if (invite) {
+    const inviter = users.find(u => u.inviteCode === invite);
+    if (inviter) {
+      inviter.referrals = (inviter.referrals || 0) + 1;
+      referrals = inviter.referrals;
+      saveUsers(users);
+    }
+  }
   const user = {
     id,
     username,
@@ -193,10 +239,13 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
     gender,
     avatar,
     glows: 0,
+    stars: 0,
     followers: [],
     bio: '',
     createdAt: Date.now(),
-    banned: false
+    banned: false,
+    inviteCode,
+    referrals
   };
   users.push(user);
   saveUsers(users);
@@ -206,6 +255,8 @@ app.post('/api/signup', upload.single('avatar'), async (req, res) => {
 
 // Login endpoint
 app.post('/api/login', async (req, res) => {
+  trackEvent('logins');
+  trackEvent('signups');
   const { username, password } = req.body;
   let users = loadUsers();
   const user = users.find(u => u.username === username);
@@ -215,6 +266,11 @@ app.post('/api/login', async (req, res) => {
   if (!match) return res.json({ error: 'Invalid credentials.' });
   const token = createSession(user.id);
   res.cookie('session', token, { httpOnly: true });
+  if (!user.achievements) user.achievements = [];
+  if (!user.achievements.includes('First Login')) {
+    user.achievements.push('First Login');
+    saveUsers(users);
+  }
   log('User logged in:', username);
   res.json({ success: true, message: 'Login successful!' });
 });
@@ -247,11 +303,25 @@ app.get('/api/profile', (req, res) => {
     username: user.username,
     bio: user.bio,
     glows: user.glows,
+    stars: user.stars || 0,
     followers: user.followers.length,
     avatar: user.avatar,
     createdAt: user.createdAt,
+    inviteCode: user.inviteCode,
+    referrals: user.referrals || 0,
     isOwner: true
   });
+// Buy stars (premium currency, demo)
+app.post('/api/buy-stars', (req, res) => {
+  const session = getSession(req);
+  if (!session) return res.json({ error: 'Not logged in.' });
+  let users = loadUsers();
+  const user = users.find(u => u.id === session.userId);
+  if (!user) return res.json({ error: 'Not found.' });
+  user.stars = (user.stars || 0) + 10;
+  saveUsers(users);
+  res.json({ success: true, stars: user.stars, message: 'Purchased 10 stars (demo)!' });
+});
 });
 
 // Update bio
@@ -284,6 +354,19 @@ const redeemLimiter = rateLimit({
   message: { error: 'Too many redeem attempts, please try again later.' }
 });
 app.post('/api/redeem', redeemLimiter, (req, res) => {
+  trackEvent('redeems');
+// Admin analytics endpoint
+app.get('/api/admin/analytics', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  let analytics = loadAnalytics();
+  const dates = Object.keys(analytics).sort();
+  res.json({
+    dates,
+    logins: dates.map(d => analytics[d].logins),
+    signups: dates.map(d => analytics[d].signups),
+    redeems: dates.map(d => analytics[d].redeems)
+  });
+});
   const session = getSession(req);
   if (!session) return res.json({ error: 'Not logged in.' });
   let users = loadUsers();
@@ -294,6 +377,10 @@ app.post('/api/redeem', redeemLimiter, (req, res) => {
   if (idx === -1) return res.json({ error: 'Invalid code.' });
   const value = redeemCodes[idx].value;
   user.glows += value;
+  if (!user.achievements) user.achievements = [];
+  if (!user.achievements.includes('First Redeem')) {
+    user.achievements.push('First Redeem');
+  }
   redeemCodes.splice(idx, 1);
   fs.writeFileSync('redeem-codes.json', JSON.stringify(redeemCodes, null, 2));
   saveUsers(users);
