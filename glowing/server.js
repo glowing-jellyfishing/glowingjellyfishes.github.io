@@ -1,40 +1,3 @@
-// Set bio (admin moderation)
-app.post('/api/admin/set-bio', (req, res) => {
-  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
-  let users = loadUsers();
-  const { id, bio } = req.body;
-  const user = users.find(u => u.id === id);
-  if (!user) return res.json({ error: 'User not found.' });
-  user.bio = bio;
-  saveUsers(users);
-  res.json({ success: true });
-});
-// Simple analytics tracking
-const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
-function loadAnalytics() {
-  try { return JSON.parse(fs.readFileSync(ANALYTICS_FILE)); } catch { return {}; }
-}
-function saveAnalytics(data) {
-  fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2));
-}
-function trackEvent(type) {
-  const today = dayjs().format('YYYY-MM-DD');
-  let analytics = loadAnalytics();
-  if (!analytics[today]) analytics[today] = { logins: 0, signups: 0, redeems: 0 };
-  analytics[today][type] = (analytics[today][type] || 0) + 1;
-  saveAnalytics(analytics);
-}
-// Leaderboard endpoint
-app.get('/api/leaderboard', (req, res) => {
-  let users = loadUsers();
-  // Ensure achievements field exists
-  users.forEach(u => { if (!u.achievements) u.achievements = []; });
-  // Sort by glows descending
-  users.sort((a, b) => b.glows - a.glows);
-  // Return top 20
-  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] })));
-});
-
 
 const fs = require('fs');
 const bcrypt = require('bcrypt');
@@ -50,7 +13,6 @@ const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
 
-
 const app = express();
 app.set('trust proxy', 1);
 const PORT = 3000;
@@ -64,6 +26,45 @@ app.use(session({
   cookie: { secure: false }
 }));
 app.use(csrf());
+
+// Simple analytics tracking
+const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
+function loadAnalytics() {
+  try { return JSON.parse(fs.readFileSync(ANALYTICS_FILE)); } catch { return {}; }
+}
+function saveAnalytics(data) {
+  fs.writeFileSync(ANALYTICS_FILE, JSON.stringify(data, null, 2));
+}
+function trackEvent(type) {
+  const today = dayjs().format('YYYY-MM-DD');
+  let analytics = loadAnalytics();
+  if (!analytics[today]) analytics[today] = { logins: 0, signups: 0, redeems: 0 };
+  analytics[today][type] = (analytics[today][type] || 0) + 1;
+  saveAnalytics(analytics);
+}
+
+// Set bio (admin moderation)
+app.post('/api/admin/set-bio', (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+  let users = loadUsers();
+  const { id, bio } = req.body;
+  const user = users.find(u => u.id === id);
+  if (!user) return res.json({ error: 'User not found.' });
+  user.bio = bio;
+  saveUsers(users);
+  res.json({ success: true });
+});
+
+// Leaderboard endpoint
+app.get('/api/leaderboard', (req, res) => {
+  let users = loadUsers();
+  // Ensure achievements field exists
+  users.forEach(u => { if (!u.achievements) u.achievements = []; });
+  // Sort by glows descending
+  users.sort((a, b) => b.glows - a.glows);
+  // Return top 20
+  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] }));
+});
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 const AVATAR_DIR = path.join(__dirname, 'public', 'avatars');
