@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tycoon City</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <header>
+      <h1>Tycoon City</h1>
+      <div class="stats">
+        <span id="money">$0</span>
+        <span id="population">Population: 0</span>
+        <span id="happiness">Happiness: 100%</span>
+      </div>
+    </header>
+    <main>
+      <div id="city-map" class="city-map"></div>
+      <div class="controls">
+        <button id="build-house">Build House ($100)</button>
+        <button id="build-shop">Build Shop ($500)</button>
+        <button id="build-park">Build Park ($300)</button>
+        <button id="upgrade-city">Upgrade City ($2000)</button>
+      </div>
+      <div class="events" id="events"></div>
+    </main>
+    <footer>
+      <button id="save-btn">Save Game</button>
+      <button id="load-btn">Load Game</button>
+      <button id="leaderboard-btn">Leaderboard</button>
+    </footer>
+  </div>
+  <div id="leaderboard-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Leaderboard</h2>
+      <ul id="leaderboard-list"></ul>
+      <button id="close-leaderboard">Close</button>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
