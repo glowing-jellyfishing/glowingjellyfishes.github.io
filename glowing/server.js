@@ -1,3 +1,23 @@
+// Glow Chat: in-memory messages (demo)
+let glowChatMessages = [];
+app.get('/api/glow-chat/messages', (req, res) => {
+  res.json(glowChatMessages.slice(-50)); // last 50 messages
+});
+app.post('/api/glow-chat/messages', (req, res) => {
+  const session = getSession(req);
+  let user = 'Guest';
+  if (session) {
+    let users = loadUsers();
+    const u = users.find(u => u.id === session.userId);
+    if (u) user = u.username;
+  }
+  const { text } = req.body;
+  if (typeof text !== 'string' || !text.trim()) return res.json({ error: 'Empty message.' });
+  const msg = { user, text: text.trim(), time: Date.now() };
+  glowChatMessages.push(msg);
+  if (glowChatMessages.length > 1000) glowChatMessages = glowChatMessages.slice(-1000);
+  res.json({ success: true });
+});
 
 const fs = require('fs');
 const bcrypt = require('bcrypt');
@@ -63,7 +83,7 @@ app.get('/api/leaderboard', (req, res) => {
   // Sort by glows descending
   users.sort((a, b) => b.glows - a.glows);
   // Return top 20
-  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] }));
+  res.json(users.slice(0, 20).map(u => ({ username: u.username, glows: u.glows, achievements: u.achievements || [] })));
 });
 
 const USERS_FILE = path.join(__dirname, 'users.json');

@@ -20,7 +20,7 @@
     "commander": "^14.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "csurf": "^1.11.0",
+    "csurf": "^1.2.2",
     "csv-parser": "^3.2.0",
     "dayjs": "^1.11.13",
     "debug": "^4.4.1",
