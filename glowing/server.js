@@ -1,3 +1,5 @@
+const express = require('express');
+const app = express();
 // Glow Chat: in-memory messages (demo)
 let glowChatMessages = [];
 app.get('/api/glow-chat/messages', (req, res) => {
@@ -27,16 +29,14 @@ const csrf = require('lusca').csrf;
 const multer = require('multer');
 const dayjs = require('dayjs');
 const crypto = require('crypto');
-const express = require('express');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
 
-const app = express();
-app.set('trust proxy', 1);
 const PORT = 3000;
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
