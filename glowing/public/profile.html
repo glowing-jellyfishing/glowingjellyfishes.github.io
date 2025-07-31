@@ -1,7 +1,3 @@
-        <p><strong>Invite Code:</strong> <span id="profileInvite"></span></p>
-        <p><strong>Referrals:</strong> <span id="profileReferrals"></span></p>
-        <p><strong>Stars (Premium):</strong> <span id="profileStars"></span></p>
-        <button id="buyStarsBtn">Buy Stars</button>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +11,10 @@
         <img id="profileAvatar" src="" alt="Profile Avatar" class="profile-avatar">
         <h2 id="profileUsername"></h2>
         <p id="profileBio"></p>
+        <p><strong>Invite Code:</strong> <span id="profileInvite"></span></p>
+        <p><strong>Referrals:</strong> <span id="profileReferrals"></span></p>
+        <p><strong>Stars (Premium):</strong> <span id="profileStars"></span></p>
+        <button id="buyStarsBtn">Buy Stars</button>
         <p><strong>Glows:</strong> <span id="profileGlows"></span></p>
         <p><strong>Followers:</strong> <span id="profileFollowers"></span></p>
         <p id="profileCreated"></p>
@@ -24,5 +24,13 @@
         <div id="profileMessage"></div>
     </div>
     <script src="profile.js"></script>
+    <script>
+        // Get userId from query string
+        function getUserIdFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('userId');
+        }
+        window.profileUserId = getUserIdFromQuery();
+    </script>
 </body>
 </html>

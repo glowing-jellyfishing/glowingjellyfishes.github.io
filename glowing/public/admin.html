@@ -45,34 +45,56 @@
     </div>
   </div>
   <script>
-    const PASSWORD = 'I@m1hacker';
-    const loginForm = document.getElementById('login-form');
-    const adminPanel = document.getElementById('admin-panel');
-    const errorMsg = document.getElementById('error-msg');
+const PASSWORD = 'I@m1hacker';
+const loginForm = document.getElementById('login-form');
+const adminPanel = document.getElementById('admin-panel');
+const errorMsg = document.getElementById('error-msg');
 
-    if (localStorage.getItem('admin-logged-in') === 'true') {
-      loginForm.style.display = 'none';
-      adminPanel.style.display = 'block';
-    }
+function showAdminPanel() {
+  loginForm.style.display = 'none';
+  adminPanel.style.display = 'block';
+  // Load admin data
+  if (window.loadAdminData) window.loadAdminData();
+}
 
-    loginForm.onsubmit = function(e) {
-      e.preventDefault();
-      const input = document.getElementById('admin-password').value;
-      if (input === PASSWORD) {
+if (localStorage.getItem('admin-logged-in') === 'true') {
+  showAdminPanel();
+}
+
+loginForm.onsubmit = function(e) {
+  e.preventDefault();
+  const input = document.getElementById('admin-password').value;
+  fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ password: input })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
         localStorage.setItem('admin-logged-in', 'true');
-        loginForm.style.display = 'none';
-        adminPanel.style.display = 'block';
-        errorMsg.textContent = '';
+        showAdminPanel();
       } else {
-        errorMsg.textContent = 'Incorrect password.';
+        errorMsg.textContent = data.error || 'Login failed.';
       }
-    };
-
-    function logout() {
+    });
+};
+function logout() {
+  fetch('/api/admin/logout', { method: 'POST', credentials: 'include' })
+    .then(() => {
       localStorage.removeItem('admin-logged-in');
       loginForm.style.display = 'block';
       adminPanel.style.display = 'none';
-    }
-  </script>
+    });
+}
+window.loadAdminData = function() {
+  if (document.getElementById('admin-panel').style.display === 'block') {
+    if (window.loadUsers) window.loadUsers();
+    if (window.loadCodes) window.loadCodes();
+    if (window.loadLogs) window.loadLogs();
+  }
+};
+</script>
 </body>
 </html>

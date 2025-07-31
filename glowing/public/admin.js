@@ -77,4 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCodes();
     loadLogs();
   }
+
+  window.loadUsers = loadUsers;
+  window.loadCodes = loadCodes;
+  window.loadLogs = loadLogs;
 });

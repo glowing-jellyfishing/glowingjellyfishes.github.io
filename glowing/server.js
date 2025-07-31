@@ -321,10 +321,12 @@ app.get('/api/profile', (req, res) => {
   const session = getSession(req);
   if (!session) return res.json({ success: false });
   let users = loadUsers();
-  const user = users.find(u => u.id === session.userId);
+  const queryId = req.query.userId;
+  let user = queryId ? users.find(u => u.id === queryId) : users.find(u => u.id === session.userId);
   if (!user) return res.json({ success: false });
   res.json({
     success: true,
+    id: user.id,
     username: user.username,
     bio: user.bio,
     glows: user.glows,
@@ -334,7 +336,7 @@ app.get('/api/profile', (req, res) => {
     createdAt: user.createdAt,
     inviteCode: user.inviteCode,
     referrals: user.referrals || 0,
-    isOwner: true
+    isOwner: user.id === session.userId
   });
 // Buy stars (premium currency, demo)
 app.post('/api/buy-stars', (req, res) => {
@@ -366,10 +368,17 @@ app.post('/api/follow', (req, res) => {
   const session = getSession(req);
   if (!session) return res.json({ error: 'Not logged in.' });
   let users = loadUsers();
-  const user = users.find(u => u.id === session.userId);
-  if (!user) return res.json({ error: 'Not found.' });
-  // For demo, can't follow self, and only one profile for now
-  res.json({ message: 'Followed!' });
+  const follower = users.find(u => u.id === session.userId);
+  if (!follower) return res.json({ error: 'Not found.' });
+  const { userId } = req.body;
+  if (!userId || userId === follower.id) return res.json({ error: 'Invalid user to follow.' });
+  const target = users.find(u => u.id === userId);
+  if (!target) return res.json({ error: 'User not found.' });
+  if (!target.followers) target.followers = [];
+  if (target.followers.includes(follower.id)) return res.json({ error: 'Already following.' });
+  target.followers.push(follower.id);
+  saveUsers(users);
+  res.json({ success: true, message: 'Followed!', followers: target.followers.length });
 });
 
 // Redeem endpoint
