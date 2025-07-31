@@ -2,9 +2,10 @@
 // Fetch and display user profile info
 
 document.addEventListener('DOMContentLoaded', async function() {
-    document.getElementById('profileInvite').textContent = data.inviteCode || '';
-    document.getElementById('profileReferrals').textContent = data.referrals || 0;
-    const res = await fetch('/api/profile', { credentials: 'include' });
+    const userId = window.profileUserId;
+    let url = '/api/profile';
+    if (userId) url += '?userId=' + encodeURIComponent(userId);
+    const res = await fetch(url, { credentials: 'include' });
     const data = await res.json();
     if (!data.success) {
         window.location.href = 'login.html';
@@ -16,6 +17,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('profileStars').textContent = data.stars || 0;
     document.getElementById('profileFollowers').textContent = data.followers;
     document.getElementById('profileAvatar').src = data.avatar || 'default-avatar.png';
+    document.getElementById('profileInvite').textContent = data.inviteCode || '';
+    document.getElementById('profileReferrals').textContent = data.referrals || 0;
     document.getElementById('buyStarsBtn').onclick = async function() {
         const res = await fetch('/api/buy-stars', { method: 'POST', credentials: 'include' });
         const d = await res.json();
@@ -43,11 +46,19 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
     }
     document.getElementById('followBtn').onclick = async function() {
-        const res = await fetch('/api/follow', { method: 'POST', credentials: 'include' });
+        const res = await fetch('/api/follow', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ userId: userId || data.id })
+        });
         const d = await res.json();
         document.getElementById('profileMessage').textContent = d.message || d.error;
+        if (d.success && d.followers !== undefined) {
+            document.getElementById('profileFollowers').textContent = d.followers;
+        }
     };
     document.getElementById('reportBtn').onclick = function() {
-        window.location.href = 'reporting-guidelines.html';
+        window.location.href = 'reporting-guidelines.html?userId=' + encodeURIComponent(userId || data.id);
     };
 });
