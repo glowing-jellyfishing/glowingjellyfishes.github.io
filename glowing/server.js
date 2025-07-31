@@ -33,6 +33,8 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const requestIp = require('request-ip');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github2').Strategy;
 
 const PORT = 3000;
 
@@ -46,6 +48,8 @@ app.use(session({
   cookie: { secure: process.env.NODE_ENV === 'production' }
 }));
 app.use(csrf());
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Simple analytics tracking
 const ANALYTICS_FILE = path.join(__dirname, 'analytics.json');
@@ -409,6 +413,55 @@ app.get('/api/admin/analytics', (req, res) => {
   res.json({ success: true, message: `Redeemed for ${value} glows!` });
 });
 
+
+// GitHub OAuth setup
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+passport.deserializeUser((id, done) => {
+  let users = loadUsers();
+  const user = users.find(u => u.id === id);
+  done(null, user || null);
+});
+
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: process.env.GITHUB_CALLBACK_URL || 'http://localhost:3000/auth/github/callback'
+}, async (accessToken, refreshToken, profile, done) => {
+  let users = loadUsers();
+  let user = users.find(u => u.githubId === profile.id);
+  if (!user) {
+    // Create new user if not exists
+    user = {
+      id: genUserId(),
+      username: profile.username || profile.displayName || 'github_' + profile.id,
+      githubId: profile.id,
+      avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+      glows: 0,
+      stars: 0,
+      followers: [],
+      bio: profile._json.bio || '',
+      createdAt: Date.now(),
+      banned: false,
+      inviteCode: crypto.randomBytes(6).toString('hex'),
+      referrals: 0
+    };
+    users.push(user);
+    saveUsers(users);
+  }
+  return done(null, user);
+}));
+
+app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+app.get('/auth/github/callback', passport.authenticate('github', {
+  failureRedirect: '/login.html',
+  session: true
+}), (req, res) => {
+  // Successful login, set session cookie
+  res.cookie('session', createSession(req.user.id), { httpOnly: true });
+  res.redirect('/profile.html');
+});
 
 // ✅ Middleware to support clean URLs
 app.use((req, res, next) => {
