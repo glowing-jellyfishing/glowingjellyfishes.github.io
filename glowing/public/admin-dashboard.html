@@ -5,19 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+      .dashboard-container { max-width: 700px; margin: 40px auto; background: #232323; padding: 30px 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; }
+      .dashboard-container input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #181818; color: #fff; }
+      .dashboard-container button { padding: 10px 30px; background: #00bfff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+      .dashboard-container button:hover { background: #0099cc; }
+      .error { color: #ff4d4d; }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
         <h2>Admin Analytics Dashboard</h2>
-        <div id="charts">
+        <form id="dashboard-login-form">
+          <input type="password" id="dashboard-admin-password" placeholder="Enter admin password" required />
+          <button type="submit">Login</button>
+          <div class="error" id="dashboard-error-msg"></div>
+        </form>
+        <div id="charts" style="display:none;">
             <canvas id="loginsChart" width="400" height="200"></canvas>
             <canvas id="signupsChart" width="400" height="200"></canvas>
             <canvas id="redeemsChart" width="400" height="200"></canvas>
             <h3>Audit Logs</h3>
             <pre id="auditLogs" style="max-height:200px;overflow:auto;background:var(--card-bg);color:var(--primary-color);font-size:0.9em;"></pre>
+            <button id="dashboard-logout-btn">Logout</button>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="admin-dashboard.js"></script>
+    <script>
+      const DASHBOARD_PASSWORD = 'I@m1hacker';
+      const loginForm = document.getElementById('dashboard-login-form');
+      const chartsDiv = document.getElementById('charts');
+      const errorMsg = document.getElementById('dashboard-error-msg');
+      const logoutBtn = document.getElementById('dashboard-logout-btn');
+      if (localStorage.getItem('dashboard-admin-logged-in') === 'true') {
+        loginForm.style.display = 'none';
+        chartsDiv.style.display = 'block';
+      }
+      loginForm.onsubmit = function(e) {
+        e.preventDefault();
+        const input = document.getElementById('dashboard-admin-password').value;
+        fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ password: input })
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              localStorage.setItem('dashboard-admin-logged-in', 'true');
+              loginForm.style.display = 'none';
+              chartsDiv.style.display = 'block';
+              window.loadDashboardData && window.loadDashboardData();
+            } else {
+              errorMsg.textContent = data.error || 'Login failed.';
+            }
+          });
+      };
+      logoutBtn.onclick = function() {
+        fetch('/api/admin/logout', { method: 'POST', credentials: 'include' })
+          .then(() => {
+            localStorage.removeItem('dashboard-admin-logged-in');
+            loginForm.style.display = 'block';
+            chartsDiv.style.display = 'none';
+          });
+      };
+      window.loadDashboardData = function() {
+        if (chartsDiv.style.display === 'block' && window.loadDashboardCharts) {
+          window.loadDashboardCharts();
+        }
+      };
+    </script>
 </body>
 </html>

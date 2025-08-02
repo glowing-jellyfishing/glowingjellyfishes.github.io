@@ -1,6 +1,6 @@
 // Admin dashboard JS
 
-document.addEventListener('DOMContentLoaded', async function() {
+window.loadDashboardCharts = async function() {
     const res = await fetch('/api/admin/analytics', { credentials: 'include' });
     const data = await res.json();
     // Load audit logs
@@ -33,4 +33,4 @@ document.addEventListener('DOMContentLoaded', async function() {
             datasets: [{ label: 'Redeems', data: data.redeems, borderColor: '#ff9800', fill: false }]
         }
     });
-});
+};
