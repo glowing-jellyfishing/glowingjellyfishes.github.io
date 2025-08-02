@@ -1,3 +1,35 @@
+// --- GitHub Webhook Receiver & Events API ---
+const WEBHOOK_EVENTS_FILE = path.join(__dirname, 'webhook-events.json');
+function loadWebhookEvents() {
+  try { return JSON.parse(fs.readFileSync(WEBHOOK_EVENTS_FILE)); } catch { return []; }
+}
+function saveWebhookEvents(events) {
+  fs.writeFileSync(WEBHOOK_EVENTS_FILE, JSON.stringify(events.slice(-50), null, 2));
+}
+
+// Endpoint to receive GitHub webhook POSTs
+app.post('/api/github-webhook', express.json({ limit: '2mb' }), (req, res) => {
+  // Optionally validate secret here
+  const eventType = req.headers['x-github-event'] || 'unknown';
+  const repo = req.body.repository && req.body.repository.full_name ? req.body.repository.full_name : 'unknown';
+  const payload = req.body;
+  const event = {
+    type: eventType,
+    repo,
+    time: Date.now(),
+    payload
+  };
+  let events = loadWebhookEvents();
+  events.push(event);
+  saveWebhookEvents(events);
+  res.json({ success: true });
+});
+
+// Endpoint to serve recent webhook events to frontend
+app.get('/api/github-webhook-events', (req, res) => {
+  const events = loadWebhookEvents();
+  res.json(events.slice(-20).reverse());
+});
 const express = require('express');
 const app = express();
 // Glow Chat: in-memory messages (demo)
