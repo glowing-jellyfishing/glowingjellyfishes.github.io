@@ -1,4 +1,18 @@
 const express = require('express');
+const fs = require('fs');
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const csrf = require('lusca').csrf;
+const multer = require('multer');
+const dayjs = require('dayjs');
+const crypto = require('crypto');
+const path = require('path');
+const rateLimit = require('express-rate-limit');
+const validator = require('validator');
+const requestIp = require('request-ip');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github2').Strategy;
 const app = express();
 // --- GitHub Webhook Receiver & Events API ---
 const WEBHOOK_EVENTS_FILE = path.join(__dirname, 'webhook-events.json');
