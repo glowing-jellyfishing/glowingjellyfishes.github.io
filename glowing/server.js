@@ -1,3 +1,5 @@
+const express = require('express');
+const app = express();
 // --- GitHub Webhook Receiver & Events API ---
 const WEBHOOK_EVENTS_FILE = path.join(__dirname, 'webhook-events.json');
 function loadWebhookEvents() {
@@ -30,8 +32,6 @@ app.get('/api/github-webhook-events', (req, res) => {
   const events = loadWebhookEvents();
   res.json(events.slice(-20).reverse());
 });
-const express = require('express');
-const app = express();
 // Glow Chat: in-memory messages (demo)
 let glowChatMessages = [];
 app.get('/api/glow-chat/messages', (req, res) => {
