@@ -1,9 +1,8 @@
 name: Monthly issue metrics
-
 on:
   workflow_dispatch:
   schedule:
-    - cron: "3 2 1 * *"  # Runs at 02:03 UTC on the 1st of every month
+    - cron: "3 2 1 * *"
 
 permissions:
   contents: read
@@ -15,32 +14,29 @@ jobs:
     permissions:
       issues: write
       pull-requests: read
-
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
       - name: Get dates for last month
         shell: bash
         run: |
+          # Calculate the first day of the previous month
           first_day=$(date -d "last month" +%Y-%m-01)
+
+          # Calculate the last day of the previous month
           last_day=$(date -d "$first_day +1 month -1 day" +%Y-%m-%d)
+
+          # Set an environment variable with the date range
+          echo "$first_day..$last_day"
           echo "last_month=$first_day..$last_day" >> "$GITHUB_ENV"
 
-      - name: Install GitHub CLI and issue-metrics extension
-        run: |
-          sudo apt-get update
-          sudo apt-get install gh -y
-          gh extension install mona-actions/gh-issue-metrics
+      - name: Run issue-metrics tool
+        uses: github/issue-metrics@v3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEARCH_QUERY: 'repo:glowing-jellyfishing/glowing-jellyfishing.github.io is:issue created:${{ env.last_month }} -reason:"not planned"'
 
-      - name: Run issue-metrics for glowing-jellyfishing.github.io
-        run: |
-          gh issue-metrics --repo glowing-jellyfishing/glowing-jellyfishing.github.io --range "${{ env.last_month }}" > issue_metrics.md
-
-      - name: Create issue with metrics
+      - name: Create issue
         uses: peter-evans/create-issue-from-file@v5
         with:
-          title: "Issue Metrics Report for ${{ env.last_month }}"
+          title: Monthly issue metrics report
           token: ${{ secrets.GITHUB_TOKEN }}
           content-filepath: ./issue_metrics.md
-          labels: monthly-report, metrics
