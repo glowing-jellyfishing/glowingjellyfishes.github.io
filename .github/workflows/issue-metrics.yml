@@ -1,3 +1,13 @@
+name: Monthly issue metrics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "3 2 1 * *"  # Runs at 02:03 UTC on the 1st of every month
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: issue metrics
@@ -7,7 +17,7 @@ jobs:
       pull-requests: read
 
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Set globally for all steps
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Auth for GitHub CLI
 
     steps:
       - name: Get dates for last month
