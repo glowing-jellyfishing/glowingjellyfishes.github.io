@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install gh -y
-          gh extension install github/gh-issue-metrics
+          gh extension install mona-actions/gh-issue-metrics
 
       - name: Run issue-metrics for glowing-jellyfishing.github.io
         run: |
