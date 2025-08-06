@@ -17,7 +17,7 @@ jobs:
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ORGANIZATION: glowing-jellyfishing  # ✅ Your GitHub org/user
+      USER: glowing-jellyfishing  # ✅ Scan all repos under your user account
 
     steps:
       - name: Get dates for last month
@@ -34,7 +34,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           START_DATE: ${{ env.START_DATE }}
           END_DATE: ${{ env.END_DATE }}
-          ORGANIZATION: glowing-jellyfishing
+          USER: glowing-jellyfishing
           SPONSOR_INFO: "true"
 
       - name: Create issue
@@ -43,4 +43,4 @@ jobs:
           title: Monthly contributor report
           token: ${{ secrets.GITHUB_TOKEN }}
           content-filepath: ./contributors.md
-          assignees: glowing-jellyfishing  # ✅ Assign to yourself
+          assignees: glowing-jellyfishing
