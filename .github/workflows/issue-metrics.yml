@@ -1,13 +1,3 @@
-name: Monthly issue metrics
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "3 2 1 * *"
-
-permissions:
-  contents: read
-
 jobs:
   build:
     name: issue metrics
@@ -15,6 +5,9 @@ jobs:
     permissions:
       issues: write
       pull-requests: read
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Set globally for all steps
 
     steps:
       - name: Get dates for last month
@@ -33,8 +26,6 @@ jobs:
       - name: Run issue-metrics across all repos
         run: |
           gh issue-metrics --search "user:glowing-jellyfishing is:issue created:${{ env.last_month }} -reason:\"not planned\"" > issue_metrics.md
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create issue with metrics
         uses: peter-evans/create-issue-from-file@v5
