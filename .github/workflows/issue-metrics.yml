@@ -31,11 +31,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install gh -y
-          gh extension install gh-issue-metrics
+          gh extension install github/gh-issue-metrics
 
-      - name: Run issue-metrics across all repos
+      - name: Run issue-metrics for glowing-jellyfishing.github.io
         run: |
-          gh issue-metrics --search "user:glowing-jellyfishing is:issue created:${{ env.last_month }} -reason:\"not planned\"" > issue_metrics.md
+          gh issue-metrics --repo glowing-jellyfishing/glowing-jellyfishing.github.io --range "${{ env.last_month }}" > issue_metrics.md
 
       - name: Create issue with metrics
         uses: peter-evans/create-issue-from-file@v5
