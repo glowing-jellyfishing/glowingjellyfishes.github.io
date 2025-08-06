@@ -7,17 +7,17 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 jobs:
   contributor_report:
     name: contributor report
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
 
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      USER: glowing-jellyfishing  # ✅ Scan all repos under your user account
+      REPOSITORY: glowing-jellyfishing/glowing-jellyfishing.github.io
+      SPONSOR_INFO: true
 
     steps:
       - name: Get dates for last month
@@ -34,8 +34,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           START_DATE: ${{ env.START_DATE }}
           END_DATE: ${{ env.END_DATE }}
-          USER: glowing-jellyfishing
-          SPONSOR_INFO: "true"
+          REPOSITORY: glowing-jellyfishing/glowing-jellyfishing.github.io
+          SPONSOR_INFO: true
 
       - name: Create issue
         uses: peter-evans/create-issue-from-file@v5
